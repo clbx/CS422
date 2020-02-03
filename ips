@@ -11,7 +11,11 @@ gsettings set org.gnome.desktop.background picture-uri "https://users.etown.edu/
 10.4.10.43 me
 10.4.10.45 Jimmy
 10.4.10.155 scott
+10.4.10.146 lindsey
 10.4.10.34 joe
 10.4.10.154 
 10.4.10.149 Lauren
 
+export DISPLAY=:0
+
+gsettings set org.gnome.desktop.background picture-uri 'https://i.imgur.com/GYMIY6f.jpg'
