@@ -61,11 +61,10 @@ char* readLine(void){
 
 Arguments getArgs(char* line){
     int pos = 0;
-    int size = 32;
     Arguments output;
     output.len = 32;
-    output.tokens = malloc(sizeof(char*) * size);
-    char** tokens = malloc(sizeof(char*) * size);
+    output.tokens = malloc(sizeof(char*) * output.len);
+    char** tokens = malloc(sizeof(char*) * output.len
     
 
     char* token = strtok(line," ");
