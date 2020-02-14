@@ -7,8 +7,6 @@
 
 #include "shell.h"
 
-char* myargs[2];
-int pid;
 
 /**
 void main(int argc, char* argv[]) {
@@ -64,7 +62,7 @@ Arguments getArgs(char* line){
     Arguments output;
     output.len = 32;
     output.tokens = malloc(sizeof(char*) * output.len);
-    char** tokens = malloc(sizeof(char*) * output.len
+    char** tokens = malloc(sizeof(char*) * output.len);
     
 
     char* token = strtok(line," ");
@@ -73,7 +71,7 @@ Arguments getArgs(char* line){
         pos++;
         if(pos == output.len){
             output.len += 32;
-            output.tokens = realloc(output.tokens,size);
+            output.tokens = realloc(output.tokens,output.len);
         }
         token = strtok(NULL," ");
         output.tokens[pos] = token;
@@ -89,14 +87,24 @@ Arguments getArgs(char* line){
 
 int main(){
     int running = 1;
-    int pid;
+    int failed;
     char* line;
     char** args;
+    int status, pid;
     printf("CS422 Shell\n");
     while(running){
         printf("> ");
         line = readLine();
         Arguments args = getArgs(line);
+        pid = fork();
+        if (pid==0) {
+                execvp(args.tokens[0],args.tokens);
+                printf("Execution Failed ");
+            }
+        waitpid(pid,&status,0);
+        if(status){
+            printf("[%d]\n",status);
+        }
         
         
 
