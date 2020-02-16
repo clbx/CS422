@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 /**
- * @file chell.c
+ * @file shell.c
  *
  * @brief  A simple shell
  *
