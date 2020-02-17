@@ -148,6 +148,8 @@ int exec(Arguments args, int runInBackground) {
     else{
         printf("New child process PID: %d\n",runningPid);
     }
+
+    return 0;
 }
 
 /**
@@ -194,6 +196,7 @@ int handleCommands(Arguments args) {
         }
         exec(args, runInBackground);
     }
+    return 0;
 }
 
 /**
@@ -242,6 +245,8 @@ int runFile(char* filename){
     }
 
     fclose(file);
+
+    return 0;
 
 }
 
