@@ -1,9 +1,59 @@
 #include "chat.h"
   
 char* str;
+chatroom* chatptr;
+int host;
 
 void handler(int signum){
-    printf("Received Message\n");
+    if(chatptr->type == 0){
+        if(host){
+            for(int pid : chatptr->readers){
+                kill(pid,SIGUSR1);
+            }
+        }
+        std::cout << chatptr->senderName << " [" << chatptr->sender << "]: ";
+        for(int i = chatptr->lowIdx; i <= chatptr->highIdx; i++){
+            printf("%c",chatptr->buff[i]);
+        }
+        printf("\n");
+    }
+    else if(chatptr-> type == 1){
+        if(host){
+            for(int pid : chatptr->readers){
+                kill(pid,SIGUSR1);
+            }
+        }
+        printf("User %d has logged on\n",chatptr->sender);
+        chatptr->writers.push_back(chatptr->sender);
+    }
+    else if(chatptr-> type == 2){
+        if(host){
+            for(int pid : chatptr->readers){
+                kill(pid,SIGUSR1);
+            }
+        }
+        printf("User %d has logged off\n",chatptr->sender);
+        chatptr->writers.erase(std::remove(chatptr->writers.begin(), chatptr->writers.end(), chatptr->sender),chatptr->writers.end());
+    }
+    //Should only be processed by host
+    else if(chatptr->type == 3){
+        if(!host){
+            printf("Signal received that should only host should receive\n");
+        }
+        chatptr->readers.push_back(chatptr->sender);
+        printf("Added Reader PID: %d\n",chatptr->sender);
+    }
+    else if(chatptr-> type == 4){
+        if(!host){
+            printf("Signal received that should only host should receive\n");
+        }
+        chatptr->readers.erase(std::remove(chatptr->readers.begin(), chatptr->readers.end(), chatptr->sender),chatptr->readers.end());
+        printf("Removed Reader PID: %d\n",chatptr->sender);
+    }
+    else{
+        printf("Unknown Message Received from: %d",chatptr->sender);
+    }
+
 } 
 
 
@@ -22,7 +72,7 @@ int main()
     //If so attatch to it
     //If not create it
 
-    int host = 0;
+    host = 0;
     int shmid;
 
     shmid = shmget(9000, sizeof(chatroom), IPC_EXCL | IPC_CREAT |0666);
@@ -36,17 +86,20 @@ int main()
         host = 1;
     }
     
-    chatroom* chatptr = (chatroom*)shmat(shmid,0,0);
+    chatptr = (chatroom*)shmat(shmid,0,0);
     printf("Attatched to shared memory ID:%d\n",shmid);
 
-    printf("Chat viewer running");
+    printf("Chat viewer running ");
     if(host){
-        chatptr->pid = getpid();
-        printf(" [Host]\n");
+        chatptr->host = getpid();
+        printf("[Host]\n");
     }else{
+        chatptr->sender = getpid();
+        chatptr->type = 3;
+        kill(chatptr->host,SIGUSR1);
         printf("\n");
     }
-    printf("Host PID: %d\n",chatptr->pid);
+    printf("Host PID: %d\n",chatptr->host);
 
     int quit = 1;
     char ch;
@@ -54,6 +107,9 @@ int main()
     while(quit){
         ch = getchar();
         if(ch == 'q'){
+            chatptr->sender = getpid();
+            chatptr->type = 4;
+            kill(chatptr->host,SIGUSR1);
             quit = 0;
         }
     }
